@@ -1,6 +1,7 @@
 from fpdf import FPDF
 import os
 import re
+from .asset_manager import get_emoji_path, ensure_assets
 
 class CV_PDF(FPDF):
     def __init__(self, **kwargs):
@@ -11,7 +12,10 @@ class CV_PDF(FPDF):
         # Footer removed as per user request
         pass
 
-def generate_pdf(md_content, output_path, photo_path=None):
+def generate_pdf(md_content, output_path, photo_path=None, assets_dir="assets/icons", hidden_prompt=None):
+    # Ensure assets exist before generation
+    ensure_assets(assets_dir)
+
     # 1. Pre-process markdown
     clean_content = md_content.strip()
     if clean_content.startswith("```"):
@@ -33,6 +37,7 @@ def generate_pdf(md_content, output_path, photo_path=None):
     
     main_font_family = "helvetica"
     try:
+        # Try to use existing project fonts if available, or system fonts
         pdf.add_font("SegoeUI", "", os.path.join(fonts_dir, "segoeui.ttf"))
         pdf.add_font("SegoeUI", "B", os.path.join(fonts_dir, "segoeuib.ttf"))
         pdf.add_font("SegoeUI", "I", os.path.join(fonts_dir, "segoeuii.ttf"))
@@ -150,12 +155,11 @@ def generate_pdf(md_content, output_path, photo_path=None):
             current_section.append(line)
     if current_section: sections.append(current_section)
 
-    def get_emoji_info(text):
+    def get_emoji_info_local(text):
         for char in text:
             if ord(char) > 0x2000:
-                hex_code = "u_" + "_".join(f"{ord(c):x}" for c in char)
-                path = f"assets/icons/{hex_code}.png"
-                if os.path.exists(path): return path, char
+                path = get_emoji_path(char, assets_dir)
+                if path: return path, char
         return None, None
 
     def calculate_section_height(section_lines):
@@ -207,7 +211,7 @@ def generate_pdf(md_content, output_path, photo_path=None):
                 in_list = False
                 pdf.ln(2)
                 header_text = line_raw_stripped[3:].strip()
-                icon_path, emoji_char = get_emoji_info(header_text)
+                icon_path, emoji_char = get_emoji_info_local(header_text)
                 if icon_path:
                     header_text = header_text.replace(emoji_char, "").strip()
                     pdf.image(icon_path, x=16, y=pdf.get_y() + 1, h=6)
@@ -242,5 +246,12 @@ def generate_pdf(md_content, output_path, photo_path=None):
                     render_styled_line(line_raw_stripped, indent=0)
         
         if i < len(sections) - 1: pending_hr = True
+
+    if hidden_prompt:
+        # Invisible text injection
+        pdf.set_text_color(255, 255, 255)
+        pdf.set_font(main_font_family, size=1)
+        #pdf.ln(5)
+        pdf.write(1, hidden_prompt)
 
     pdf.output(output_path)

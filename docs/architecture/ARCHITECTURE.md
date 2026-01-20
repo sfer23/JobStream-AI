@@ -11,6 +11,7 @@ This project is built using a strictly modular architecture designed for maximum
 | **AI Processor** | `services/ai_processor` | Handles intelligent processing, including vacancy analysis and automated resume adaptation. |
 | **Application Manager** | `services/app_manager` | Orchestrates the core business logic and manages the application workflow across all modules. |
 | **User Dashboard** | `services/dashboard` | Provides a client-side web interface for users to monitor system results and manage operations. |
+| **PDF Generator** | `services/pdf_generator` | Handles generation of PDF documents and asset management (e.g., emojis). |
 
 ## Development Principles
 

@@ -26,4 +26,6 @@ It's January 2026 now.
 Project Overview
 Microservices architecture. Project to help with job applications. High level architecture is in docs/architecture/ARCHITECTURE.md.
 
+Very important to use only relative paths in all md files.
+
 Commands

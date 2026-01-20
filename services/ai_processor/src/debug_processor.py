@@ -7,18 +7,15 @@ from dotenv import load_dotenv
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.processor import CVProcessor
-from src.pdf_gen import generate_pdf
 
 def main():
     load_dotenv()
     
     parser = argparse.ArgumentParser(description="AI CV Processor Debug Tool")
-    parser.add_argument("--action", choices=["analyze", "optimize", "pdf", "cover_letter"], required=True, help="Action to perform")
+    parser.add_argument("--action", choices=["analyze", "optimize", "cover_letter"], required=True, help="Action to perform")
     parser.add_argument("--job", help="Path to job JSON")
     parser.add_argument("--cv", help="Path to CV Markdown")
     parser.add_argument("--prefs", help="Path to preferences Markdown")
-    parser.add_argument("--optimized-cv-path", help="Path to existing optimized CV Markdown (for direct PDF generation)")
-    parser.add_argument("--photo", help="Path to candidate photo (for PDF generation)")
     parser.add_argument("--output-dir", default="debug/output", help="Directory for output files")
     parser.add_argument("--debug-dir", default="debug/logs", help="Directory for LLM request/reponse logs")
     
@@ -48,26 +45,6 @@ def main():
         with open(opt_cv_full_path, "w", encoding="utf-8") as f:
             f.write(optimized_cv)
         print(f"Optimized CV saved to {opt_cv_full_path}")
-    
-    elif args.action == "pdf":
-        print(f"--- Action: PDF Generation ---")
-        optimized_cv = ""
-        
-        if args.optimized_cv_path:
-            print(f"Loading existing optimized CV from: {args.optimized_cv_path}")
-            with open(args.optimized_cv_path, "r", encoding="utf-8") as f:
-                optimized_cv = f.read()
-        else:
-            print("Optimized CV path not provided. Generating from job, CV, and preferences...")
-            optimized_cv = processor.optimize_cv(job_path, cv_path, prefs_path)
-            # Optionally save the intermediate MD
-            opt_cv_temp_path = os.path.join(args.output_dir, "cv_optimized.md")
-            with open(opt_cv_temp_path, "w", encoding="utf-8") as f:
-                f.write(optimized_cv)
-
-        pdf_output_path = os.path.join(args.output_dir, "cv_optimized.pdf")
-        generate_pdf(optimized_cv, pdf_output_path, photo_path=args.photo)
-        print(f"PDF CV saved to {pdf_output_path}")
     
     elif args.action == "cover_letter":
         print(f"--- Action: Cover Letter Creation ---")
