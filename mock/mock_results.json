@@ -1,0 +1,67 @@
+[
+  {
+    "id": "0ff579bc",
+    "title": "Generic Developer 1",
+    "company": "Mock Company 1",
+    "location": "Remote",
+    "url": "https://example.com/jobs/0ff579bc",
+    "source": "mock",
+    "salary": null,
+    "date_posted": null,
+    "extra_data": {
+      "meta": "mock data"
+    }
+  },
+  {
+    "id": "5d0e0e8a",
+    "title": "Generic Developer 2",
+    "company": "Mock Company 2",
+    "location": "Remote",
+    "url": "https://example.com/jobs/5d0e0e8a",
+    "source": "mock",
+    "salary": null,
+    "date_posted": null,
+    "extra_data": {
+      "meta": "mock data"
+    }
+  },
+  {
+    "id": "d26c8e35",
+    "title": "Generic Developer 3",
+    "company": "Mock Company 3",
+    "location": "Remote",
+    "url": "https://example.com/jobs/d26c8e35",
+    "source": "mock",
+    "salary": null,
+    "date_posted": null,
+    "extra_data": {
+      "meta": "mock data"
+    }
+  },
+  {
+    "id": "9a2a9ae0",
+    "title": "Generic Developer 4",
+    "company": "Mock Company 4",
+    "location": "Remote",
+    "url": "https://example.com/jobs/9a2a9ae0",
+    "source": "mock",
+    "salary": null,
+    "date_posted": null,
+    "extra_data": {
+      "meta": "mock data"
+    }
+  },
+  {
+    "id": "a8f72b50",
+    "title": "Generic Developer 5",
+    "company": "Mock Company 5",
+    "location": "Remote",
+    "url": "https://example.com/jobs/a8f72b50",
+    "source": "mock",
+    "salary": null,
+    "date_posted": null,
+    "extra_data": {
+      "meta": "mock data"
+    }
+  }
+]

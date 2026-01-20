@@ -1,0 +1,7 @@
+psycopg2-binary
+redis
+sqlalchemy
+openai
+python-dotenv
+fpdf2
+jinja2

@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  # --- Infrastructure ---
+  postgres:
+    image: postgres:15-alpine
+    container_name: job_app_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-app}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+      POSTGRES_DB: ${DB_NAME:-job_search}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: job_app_redis
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: job_app_ollama
+    volumes:
+      - ./data/ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - app_network
+    # Note: If no GPU, remove the deploy section.
+
+  # --- Application Services ---
+  
+  # 1. User Dashboard (PHP/Laravel)
+  dashboard:
+    build:
+      context: ./services/dashboard
+      dockerfile: Dockerfile
+    container_name: job_app_dashboard
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - app_network
+    volumes:
+      - ./services/dashboard:/var/www/html
+
+  # 2. Job Scanner (Python)
+  scanner:
+    build:
+      context: ./services/scanner
+      dockerfile: Dockerfile
+    container_name: job_app_scanner
+    environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - app_network
+    volumes:
+      - ./services/scanner:/app
+
+  # 3. AI Processor (Python)
+  ai_processor:
+    build:
+      context: ./services/ai_processor
+      dockerfile: Dockerfile
+    container_name: job_app_ai
+    environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
+      OLLAMA_HOST: http://ollama:11434
+    depends_on:
+      - postgres
+      - redis
+      - ollama
+    networks:
+      - app_network
+    volumes:
+      - ./services/ai_processor:/app
+
+  # 4. Application Manager (Python)
+  app_manager:
+    build:
+      context: ./services/app_manager
+      dockerfile: Dockerfile
+    container_name: job_app_manager
+    environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - app_network
+    volumes:
+      - ./services/app_manager:/app
+
+networks:
+  app_network:
+    driver: bridge
